@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ProductService} from '../../services/product.service';
 import {Product} from '../../common/product';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-product-list',
@@ -10,19 +11,28 @@ import {Product} from '../../common/product';
 export class ProductListComponent implements OnInit {
 
   products: Product[];
+  currentCategoryId: number;
 
-  constructor(private productService: ProductService) {
+  constructor(private productService: ProductService, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
-    this.loadProducts();
+    this.route.paramMap.subscribe(() => {
+      this.loadProducts();
+    });
   }
 
   loadProducts(): void {
-    this.productService.getProductList().subscribe(
+
+    const hasCategoryId: boolean = this.route.snapshot.paramMap.has('id');
+    // Convert string to number using '+' symbol
+    this.currentCategoryId = hasCategoryId ? +this.route.snapshot.paramMap.get('id') : 1;
+
+    this.productService.getProductList(this.currentCategoryId).subscribe(
       data => {
         this.products = data;
       }
     );
   }
+
 }

@@ -11,7 +11,7 @@
   <tbody>
   <tr *ngFor="let product of products">
     <td class="align-middle">
-      <img src="{{product.imageUrl}}" height="50"/>
+      <img height="50" src="{{product.imageUrl}}"/>
     </td>
     <td class="align-middle">{{product.name}}</td>
     <td class="align-middle">{{product.unitPrice | currency:'USD'}}</td>

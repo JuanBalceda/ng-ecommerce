@@ -121,6 +121,7 @@
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "ng-ecommerce"
 }
