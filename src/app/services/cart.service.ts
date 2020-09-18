@@ -19,15 +19,7 @@ export class CartService {
 
     let existingCartItem;
 
-    if (this.cartItems.length > 0) {
-      for (const tempCartItem of this.cartItems) {
-        if (tempCartItem.id === cartItem.id) {
-          existingCartItem = tempCartItem;
-          break;
-        }
-      }
-    }
-
+    existingCartItem = this.cartItems.find(c => c.id === cartItem.id);
     if (existingCartItem) {
       existingCartItem.quantity++;
     } else {
