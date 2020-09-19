@@ -19,7 +19,7 @@ export class CartService {
 
     let existingCartItem;
 
-    existingCartItem = this.cartItems.find(c => c.id === cartItem.id);
+    existingCartItem = this.cartItems.find(i => i.id === cartItem.id);
     if (existingCartItem) {
       existingCartItem.quantity++;
     } else {
@@ -53,5 +53,26 @@ export class CartService {
 
     console.log(`totalPrice=${totalPriceValue.toFixed(2)}, totalQuantity=${totalQuantityValue}`);
     console.log('------------------------------------');
+  }
+
+  decrementQuantity(cartItem: CartItem): void {
+
+    cartItem.quantity--;
+
+    if (cartItem.quantity === 0) {
+      this.remove(cartItem);
+    } else {
+      this.computeCartTotals();
+    }
+  }
+
+  remove(cartItem: CartItem): void {
+
+    const itemIndex = this.cartItems.findIndex(i => i.id === cartItem.id);
+
+    if (itemIndex > -1) {
+      this.cartItems.splice(itemIndex, 1);
+      this.computeCartTotals();
+    }
   }
 }
