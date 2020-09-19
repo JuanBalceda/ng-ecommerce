@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CartService} from '../../services/cart.service';
 import {FormService} from '../../services/form.service';
 import {State} from '../../common/state';
@@ -47,9 +47,9 @@ export class CheckoutComponent implements OnInit {
   initFormGroup(): void {
     this.checkoutFormGroup = this.formBuilder.group({
       customer: this.formBuilder.group({
-        firstName: [''],
-        lastName: [''],
-        email: ['']
+        firstName: new FormControl('', [Validators.required, Validators.minLength(2)]),
+        lastName: new FormControl('', [Validators.required, Validators.minLength(2)]),
+        email: new FormControl('', [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')])
       }),
       shippingAddress: this.formBuilder.group({
         street: [''],
@@ -77,6 +77,11 @@ export class CheckoutComponent implements OnInit {
   }
 
   onSubmit(): void {
+
+    if (this.checkoutFormGroup.invalid) {
+      this.checkoutFormGroup.markAllAsTouched();
+    }
+
     console.log(this.checkoutFormGroup.get('customer').value);
     console.log(this.checkoutFormGroup.get('shippingAddress').value);
     console.log(this.checkoutFormGroup.get('billingAddress').value);
@@ -124,5 +129,17 @@ export class CheckoutComponent implements OnInit {
 
       formGoup.get('state').setValue(data[0]);
     });
+  }
+
+  get firstName(): AbstractControl {
+    return this.checkoutFormGroup.get('customer.firstName');
+  }
+
+  get lastName(): AbstractControl {
+    return this.checkoutFormGroup.get('customer.lastName');
+  }
+
+  get email(): AbstractControl {
+    return this.checkoutFormGroup.get('customer.email');
   }
 }
