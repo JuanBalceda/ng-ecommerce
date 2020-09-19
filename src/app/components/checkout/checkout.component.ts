@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {CartService} from '../../services/cart.service';
 import {FormService} from '../../services/form.service';
+import {State} from '../../common/state';
+import {Country} from '../../common/country';
 
 @Component({
   selector: 'app-checkout',
@@ -12,11 +14,15 @@ export class CheckoutComponent implements OnInit {
 
   checkoutFormGroup: FormGroup;
 
-  totalPrice = 0.00;
-  totalQuantity = 0;
+  countries: Country[] = [];
+  shippingAddressStates: State[] = [];
+  billingAddressStates: State[] = [];
 
   creditCardMonths: number[] = [];
   creditCardYears: number[] = [];
+
+  totalPrice = 0.00;
+  totalQuantity = 0;
 
   constructor(private formBuilder: FormBuilder,
               private cartService: CartService,
@@ -25,6 +31,8 @@ export class CheckoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.initFormGroup();
+
+    this.formService.getCountries().subscribe(data => this.countries = data);
 
     const startMonth = new Date().getMonth() + 1;
     this.formService.getCreditCardMonths(startMonth).subscribe(data => this.creditCardMonths = data);
@@ -81,8 +89,12 @@ export class CheckoutComponent implements OnInit {
     if (event.target.checked) {
       this.checkoutFormGroup.controls.billingAddress
         .setValue(this.checkoutFormGroup.controls.shippingAddress.value);
+
+      this.billingAddressStates = this.shippingAddressStates;
     } else {
       this.checkoutFormGroup.controls.billingAddress.reset();
+
+      this.billingAddressStates = [];
     }
   }
 
@@ -94,5 +106,23 @@ export class CheckoutComponent implements OnInit {
 
     const startMonth = (currentDate === selectedYear) ? new Date().getMonth() + 1 : 1;
     this.formService.getCreditCardMonths(startMonth).subscribe(data => this.creditCardMonths = data);
+  }
+
+
+  getStates(formGroupName: string): void {
+
+    const formGoup = this.checkoutFormGroup.get(formGroupName);
+    const selectedCountryCode: string = formGoup.value.country.code;
+
+    this.formService.getStates(selectedCountryCode).subscribe(data => {
+
+      if (formGroupName === 'shippingAddress') {
+        this.shippingAddressStates = data;
+      } else if (formGroupName === 'billingAddress') {
+        this.billingAddressStates = data;
+      }
+
+      formGoup.get('state').setValue(data[0]);
+    });
   }
 }
